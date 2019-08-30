@@ -11,7 +11,7 @@ class App extends React.Component {
     logging: false,
     score: [],
     tiebreaker: false,
-    game: { P1S: 0, P2S: 0 },
+    game: { P1S: 6, P2S: 5 },
     points: { P1: 0, P2: 0 },
     P1Name: 'Player 1',
     P2Name: 'Player 2'
@@ -44,45 +44,34 @@ class App extends React.Component {
     this.state.settingPage === true ? this.setState({ settingPage: false }) : this.setState({ settingPage: true });
     return
   };
+
+
+
+
+
+
+
+
   addPoint = (player) => {
+    console.log('score', this.state.score);
     if (this.state.points.P1 === this.state.points.P2 && this.state.points.P1 === 3) player === 'P1' ? this.setState({ points: { P1: this.state.points.P1 + 1, P2: 5 } }) : this.setState({ points: { P2: this.state.points.P2 + 1, P1: 5 } });
     else if (this.state.game.P2S === this.state.game.P1S && this.state.game.P2S === 6) { // Tiebreaker
-      if ((this.state.tiebreaker.P1T + 1 >= this.state.tiebreaker.P2T + 2 && this.state.tiebreaker.P1T + 1 >= 7) || (this.state.tiebreaker.P1T + 2 <= this.state.tiebreaker.P2T + 1 && this.state.tiebreaker.P2T + 1 >= 7)) {
-        if (this.state.score.length === 0) { // First set tiebreaker
-          player === 'P1'
-            ? this.setState(prevState => ({
-              points: { P1: 0, P2: 0 },
-              score: [{ ...prevState.game, P1S: this.state.game.P1S + 1, P1T: this.state.tiebreaker.P1T + 1, P2T: this.state.tiebreaker.P2T }],
-              game: { P1S: 0, P2S: 0 },
-              tiebreaker: false
-            }))
-            : this.setState(prevState => ({
-              points: { P1: 0, P2: 0 },
-              score: [{ ...prevState.game, P2S: this.state.game.P2S + 1, P2T: this.state.tiebreaker.P2T + 1, P1T: this.state.tiebreaker.P1T }],
-              game: { P1S: 0, P2S: 0 },
-              tiebreaker: false
-            }));
-        }
-        else { // Subsequent set tiebreaker
-          player === 'P1'
-            ? this.setState(prevState => ({
-              points: { P1: 0, P2: 0 },
-              score: [...prevState.score,
-              { ...prevState.game, P1S: this.state.game.P1S + 1, P1T: this.state.tiebreaker.P1T + 1, P2T: this.state.tiebreaker.P2T }],
-              game: { P1S: 0, P2S: 0 },
-              tiebreaker: false
-            }))
-            : this.setState(prevState => ({
-              points: { P1: 0, P2: 0 },
-              score: [...prevState.score,
-              { ...prevState.game, P2S: this.state.game.P2S + 1, P2T: this.state.tiebreaker.P2T + 1, P1T: this.state.tiebreaker.P1T }],
-              game: { P1S: 0, P2S: 0 },
-              tiebreaker: false
-            }));
-        }
+      console.log('tiebreaker status', this.state.tiebreaker);
+      if (!!this.state.tiebreaker && (this.state.tiebreaker.P1T + 1 < 7 || this.state.tiebreaker.P1T <= this.state.tiebreaker.P2T) && player === 'P1') {
+        this.setState(prevState => ({ tiebreaker: { P1T: prevState.tiebreaker.P1T + 1, P2T: prevState.tiebreaker.P2T } }))
       }
-      else {
-        player === 'P1' ? this.setState(prevState => ({ tiebreaker: { ...prevState.tiebreaker, P1T: this.state.tiebreaker.P1T + 1 } })) : this.setState(prevState => ({ tiebreaker: { ...prevState.tiebreaker, P2T: this.state.tiebreaker.P2T + 1 } }));
+      else if (!!this.state.tiebreaker && (this.state.tiebreaker.P2T + 1 < 7 || this.state.tiebreaker.P1T >= this.state.tiebreaker.P2T) && player === 'P2') {
+        this.setState(prevState => ({ tiebreaker: { P1T: prevState.tiebreaker.P1T, P2T: prevState.tiebreaker.P2T + 1 } }));
+      }
+      else if (!!this.state.tiebreaker && ((this.state.tiebreaker.P1T + 1 >= 7 && player === 'P1') || (this.state.tiebreaker.P2T + 1 >= 7 && player === 'P2'))) {
+        if (player === 'P1' && this.state.tiebreaker.P1T + 1 >= this.state.tiebreaker.P2T + 2) {
+          console.log('P1 wins tiebreak')
+          this.setState(prevState => ({ score: [...prevState.score, { P1S: 7, P1T: this.state.tiebreaker.P1T + 1, P2S: 6, P2T: this.state.tiebreaker.P2T }], game: { P1S: 0, P2S: 0 }, tiebreaker: false, points: { P1: 0, P2: 0 } }))
+        }
+        if (player === 'P2' && this.state.tiebreaker.P2T + 1 >= this.state.tiebreaker.P1T + 2) {
+          console.log('P2 wins tiebreak')
+          this.setState(prevState => ({ score: [...prevState.score, { P2S: 7, P2T: this.state.tiebreaker.P2T + 1, P1S: 6, P1T: this.state.tiebreaker.P1T }], game: { P1S: 0, P2S: 0 }, tiebreaker: false, points: { P1: 0, P2: 0 } }))
+        }
       }
     }
     else if (this.state.points.P1 === 3 && player === 'P1') {
@@ -168,10 +157,10 @@ class App extends React.Component {
       if (player === 'P2') {
         this.setState({ points: { P1: 3, P2: 3 } })
       }
-      else {
+      else if (player === 'P1') {
         if (this.state.score.length === 0) {
-          if (this.state.game.P1S + 1 === 6 && this.state.game.P2S < 5) {
-            this.setState(prevState => ({ points: { P1: 0, P2: 0 }, score: [{ ...prevState.game, P1S: this.state.game.P1S + 1 }] }))
+          if (this.state.game.P1S + 1 >= 6 && this.state.game.P2S < 6) {
+            this.setState(prevState => ({ points: { P1: 0, P2: 0 }, score: [{ ...prevState.game, P1S: this.state.game.P1S + 1 }], game: { P1S: 0, P2S: 0 } }))
           }
           else {
             this.setState(prevState => ({
@@ -181,8 +170,8 @@ class App extends React.Component {
           }
         }
         else {
-          if (this.state.game.P1S + 1 === 6 && this.state.game.P2S < 5) {
-            this.setState(prevState => ({ points: { P1: 0, P2: 0 }, score: [...prevState.score, { ...prevState.game, P1S: this.state.game.P1S + 1 }] }));
+          if (this.state.game.P1S + 1 >= 6 && this.state.game.P2S < 6) {
+            this.setState(prevState => ({ points: { P1: 0, P2: 0 }, score: [...prevState.score, { ...prevState.game, P1S: this.state.game.P1S + 1 }], game: { P1S: 0, P2S: 0 } }));
           }
           else {
             this.setState(prevState => ({
@@ -200,10 +189,10 @@ class App extends React.Component {
       if (player === 'P1') {
         this.setState({ points: { P1: 3, P2: 3 } })
       }
-      else {
+      else if (player === 'P2'){
         if (this.state.score.length === 0) {
-          if (this.state.game.P2S + 1 === 6 && this.state.game.P1S < 5) {
-            this.setState(prevState => ({ points: { P1: 0, P2: 0 }, score: [{ ...prevState.game, P2S: this.state.game.P2S + 1 }] }))
+          if (this.state.game.P2S + 1 === 6 && this.state.game.P1S < 6) {
+            this.setState(prevState => ({ points: { P1: 0, P2: 0 }, score: [{ ...prevState.game, P2S: this.state.game.P2S + 1 }], game: { P1S: 0, P2S: 0 } }))
           }
           else {
             this.setState(prevState => ({
@@ -213,8 +202,8 @@ class App extends React.Component {
           }
         }
         else {
-          if (this.state.game.P2S + 1 === 6 && this.state.game.P1S < 5) {
-            this.setState(prevState => ({ points: { P1: 0, P2: 0 }, score: [...prevState.score, { ...prevState.game, P2S: this.state.game.P2S + 1 }] }));
+          if (this.state.game.P2S + 1 === 6 && this.state.game.P1S < 6) {
+            this.setState(prevState => ({ points: { P1: 0, P2: 0 }, score: [...prevState.score, { ...prevState.game, P2S: this.state.game.P2S + 1 }], game: { P1S: 0, P2S: 0 } }));
           }
           else {
             this.setState(prevState => ({
@@ -248,24 +237,20 @@ class App extends React.Component {
                 </tr>
                 <tr>
                   <td className='player-name'>{this.state.P1Name}</td>
-                  {this.state.score.length > 0 ? this.state.score.map((set, index) => (<td key={'P1Set' + index + 1}>{set.P1S}{set.P1T && <span className='tiebreaker'>{set.P1T === 0 ? 0 : set.P1T }</span>}</td>)) : <td>{this.state.game.P1S}</td>}
+                  {this.state.score.length > 0 ? this.state.score.map((set, index) => (<td key={'P1Set' + index + 1}>{set.P1S}{set.P1T && <span className='tiebreaker'>{set.P1T == 0 ? '0' : set.P1T}</span>}</td>)) : <td>{this.state.game.P1S}</td>}
                   {this.state.score.length > 0 && <td>{this.state.game.P1S}</td>}
                   <td className='points'>{this.state.tiebreaker ? this.state.tiebreaker.P1T : points[this.state.points.P1]}</td>
+                  <td><button id='P1' className='add-point' onClick={(e) => { this.addPoint(e.target.id) }}>Add Point</button></td>
                 </tr>
                 <tr>
                   <td className='player-name'>{this.state.P2Name}</td>
-                  {this.state.score.length > 0 ? this.state.score.map((set, index) => (<td key={'P2Set' + index + 1}>{set.P2S}{set.P2T && <span className='tiebreaker'>{set.P2T === 0 ? '0' : set.P2T}</span>}</td>)) : <td>{this.state.game.P2S}</td>}
+                  {this.state.score.length > 0 ? this.state.score.map((set, index) => (<td key={'P2Set' + index + 1}>{set.P2S}{set.P2T && <span className='tiebreaker'>{set.P2T == 0 ? '0' : set.P2T}</span>}</td>)) : <td>{this.state.game.P2S}</td>}
                   {this.state.score.length > 0 && <td>{this.state.game.P2S}</td>}
                   <td className='points'>{this.state.tiebreaker ? this.state.tiebreaker.P2T : points[this.state.points.P2]}</td>
+                  <td><button id='P2' className='add-point' onClick={(e) => { this.addPoint(e.target.id) }}>Add Point</button></td>
                 </tr>
               </tbody>
             </table>
-          </div>
-          <div className='row'>
-            <button id='P1' onClick={(e) => { this.addPoint(e.target.id) }}>Add Point</button>
-          </div>
-          <div className='row'>
-            <button id='P2' onClick={(e) => { this.addPoint(e.target.id) }}>Add Point</button>
           </div>
         </div>
       </div>

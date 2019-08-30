@@ -67,6 +67,67 @@ td {
     text-align: center;
     margin: 0 auto;
 }
+.player-name {
+    width: 25vw;
+}
+@media screen and (min-width: 374px), (min-height: 800px){
+    td {
+        // outline: 1px solid #000000;
+        width: 20px;
+        height: 6%;
+        font-size: $m-size;
+    }
+    body {
+        display: block;
+        width: 100vw;
+        margin: auto;
+        background: gray;
+    }
+    .container {
+        background: white;
+        max-width: 375px;
+        max-height: 812px;
+    }
+    .header-row {
+        max-width: 375px;
+    }
+    .header {
+        font-size: 220%;
+        line-height: 2.4;
+    }
+    #setting-button {
+        position: relative;
+    }
+    .score-card {
+        max-width: 375px;
+        display: block;
+        text-align: center;
+        margin: 0 auto;
+    }
+    #settings-page {
+        height: 812px;
+        width: 375px;
+        position: fixed;
+        top: -100vh;
+        background-color: orange;
+        z-index: -1;
+        transition: transform 2s;
+    }
+    .player-name {
+        width: 25%;
+    }
+    tr, table{
+        width: 90%;
+    }
+    .add-point {
+        width: 90px;
+        float: right;
+    }
+}
+.add-point {
+    float: right;
+    margin-right: 5px;
+}
 .tiebreaker {
     font-size: $xs-size;
     top: -.75rem;
@@ -74,7 +135,4 @@ td {
 }
 .points {
     background-color: rgba($color: green, $alpha: .1)
-}
-.player-name {
-    width: 25vw;
 }
